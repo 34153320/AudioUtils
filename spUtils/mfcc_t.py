@@ -22,6 +22,7 @@ class MFCCT(torch.nn.Module):
          super().__init__()
          self.fbank = fBank()
          self.dict_type = dict_type
+         self.n_mel  = n_mel
 
      def _init_kernel_(self):
          """
@@ -47,7 +48,9 @@ class MFCCT(torch.nn.Module):
              if self.norm == 'ortho':
                 dict_kernel *= np.sqrt(1/(2*self.n_mel))
          elif self.dict_type == 4:
-
-
+             dict_kernel = 2.0 * \
+                 torch.cos(np.pi * torch.matmul(2.*numMels+1.0, 2.* numMFCC.T + 1)/4./self.n_mel)
+             if self.norm == 'ortho':
+                 dict_kernel *= np.sqrt(1/self.n_mel/2)
          else:
              raise RuntimeError("Type {} is not supported".format(self.dict_type))
